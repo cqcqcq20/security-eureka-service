@@ -1,0 +1,87 @@
+server:
+  port: 9510
+
+spring:
+  application:
+    name: auth-service
+  mvc:
+    throw-exception-if-no-handler-found: true
+  redis:
+    database: 1
+    port: 6379
+    host: 192.168.31.52
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 4
+    timeout: 1000ms
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      url: jdbc:mysql://192.168.31.52:3306/auth?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+      username: root
+      password: 123456
+      stat-view-servlet:
+        login-username: admin
+        login-password: admin
+        enabled: true
+        url-pattern: /druid/*
+      initial-size: 100
+      min-idle: 50
+      max-active: 200
+      max-wait: 65535
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        exclusions: "*.js,*.gif,*.jpg"
+    username: user-client
+    password: user-secret-8888
+  kafka:
+    producer:
+      bootstrap-servers: 192.168.31.52:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      batch-size: 4096
+    bootstrap-servers: 192.168.31.52:9092
+  liquibase:
+    enabled: false
+    drop-first: false
+    url: ${spring.datasource.druid.url}
+    user: ${spring.datasource.druid.username}
+    password: ${spring.datasource.druid.password}
+    change-log: classpath:liquibase/master.xml
+
+mybatis-plus:
+  mapper-locations: classpath*:/mybatis-mappers/*
+  type-aliases-package: com.example.music.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+management:
+  endpoint:
+    health:
+      enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka:123456@localhost:9500/eureka/
+
+api:
+  boot:
+    sequence:
+      worker-id: 1
+
+sms:
+  verify:
+    length: 6
+    expMin: 5
+
+app:
+  password:
+    matches: "^[\\w_-]{6,16}$"
+
+logging:
+  level:
+    org.springframework: debug
